@@ -1,7 +1,15 @@
 var dest = new Date();
 function Redirect()
 {
-  location.reload(true);
+  var request = $.ajax({url: location.href});
+  request.done(function(response, textStatus, jqXHR) {
+    $("body").html($(response));
+  });
+  request.fail(function(jqXHR, textStatus, errorThrown) {
+    console.log(textStatus);
+    console.log(errorThrown);
+    alert("Error reloading page:\n"+errorThrown);
+  });
 }
 function count() {
     var cur = new Date();
