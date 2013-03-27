@@ -1,0 +1,46 @@
+extends layout
+
+block css
+  link(rel='stylesheet',href='http://twitter.github.com/bootstrap/assets/css/bootstrap.css')
+
+block js
+  script(type='text/javascript',src='http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js')
+  script(type='text/javascript',src='http://twitter.github.com/bootstrap/assets/js/bootstrap.js')
+  script
+    $(function() {
+      $("#config").submit(function() {
+          $("input[name=team]").each(function(i,v) {
+            var t = $(this);
+            if (t.val() == "") {
+              t.val(t.attr("placeholder"));
+            }
+          });
+          $("input[name=event]").each(function(i,v) {
+            var t = $(this);
+            if (t.val() == "") {
+              t.val(t.attr("placeholder"));
+            }
+          });
+          $("input[name=refresh]").each(function(i,v) {
+            var t = $(this);
+            if (t.val() == "") {
+              t.val(t.attr("placeholder"));
+            }
+          });
+          $(this).submit();
+      });
+    });
+
+block content
+  .container(style="margin-top:40px;")
+    form(id="config",action="display",method="get",class="well span3 offset4")
+      fieldset
+        legend 254 Pit Display
+        label Team Number
+        input(name="team",type="text",placeholder="254")
+        label Event Code 
+          a(href="http://frclinks.frclinks.com/") (options)
+        input(name="event",type="text",placeholder="casd")
+        label Refresh Time (seconds)
+        input(name="refresh",type="text",placeholder="30")
+        button(type="submit", class="btn") Submit
