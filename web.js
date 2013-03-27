@@ -11,8 +11,9 @@ app.set('view engine', 'jade')
 app.use(express.static(__dirname + '/public'))
 
 app.get('/', function(req, res) {
+  var test = parseInt(req.query.test) || Number.POSITIVE_INFINITY;
   var year = req.query.year || "2013"
-  var refresh=parseInt(req.query.refresh) || 10;
+  var refresh=parseInt(req.query.refresh)*1000 || 30000;
   var team=req.query.team || "254";
   var ev=req.query.event || "casd";
   var elims=parseInt(req.query.elims) || 0;
@@ -45,10 +46,7 @@ app.get('/', function(req, res) {
                              redscore: $(rowdata[8]).text(),
                              bluescore: $(rowdata[9]).text()});
                  }
-                 dest = 0;
-                 refresh = 30000;
-                 //res.send("<html><head><title>yeah buddy</title></head><body><"+display+"></body></html>");
-                 res.render('display', {team: team, data: data, dest: dest, refresh: refresh});
+                 res.render('display', {test: test, team: team, data: data, refresh: refresh});
              });
            }
   );

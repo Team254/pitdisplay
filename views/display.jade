@@ -2,7 +2,7 @@ extends layout
 
 block js
   script
-    var dest=new Date(#{dest});var refresh=#{refresh};
+    var refresh=#{refresh};
 
 block content
   table.mainTable
@@ -11,10 +11,12 @@ block content
       td.red Red Alliance
       td.blue Blue Alliance
       td.outcome Time / Result
+    - var count = 0;
     - each row in data
       - var potential = [row.red1, row.red2, row.red3, row.blue1, row.blue2, row.blue3]
       - var spot = potential.indexOf(team)
       - if (spot > -1)
+        - count += 1;
         - var redness = spot < 3 ? "myred" : "";
         - var blueness = spot > 2 ? "myblue" : "";
         tr.matchRow
@@ -34,7 +36,7 @@ block content
           td.outcome
             - var first = spot < 3 ? "myTeam" : "";
             - var second = spot > 2 ? "myTeam" : "";
-            - if (row.redscore != "" && row.bluescore != "")
+            - if (row.redscore != "" && row.bluescore != "" && count <= test)
               - var outcome = "";
               - if (row.redscore == row.bluescore)
                 - outcome = "T";
@@ -48,4 +50,5 @@ block content
                   td(class="oneTeam #{second}") #{row.redscore}
                   td(class="oneTeam") #{outcome}
             - else
-              #{row.time}
+              div.time #{row.time}
+  #countdown
