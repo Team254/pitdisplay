@@ -3,6 +3,9 @@ $(window).resize(function() {
     var size=parseInt($("tbody").css("font-size").substr(0,$("tbody").css("font-size").length-2));
     while($(document).height()>$(window).height()) {
         size=parseInt($("tbody").css("font-size").substr(0,$("tbody").css("font-size").length-2));
+        console.log(size);
+        console.log($(document).height());
+        console.log($(window).height());
         $("html").css("font-size",(size-1)+"px");
         $("tbody").css("font-size",(size-1)+"px");
         $("tbody").css("font-size",(size-1)+"px");
@@ -18,9 +21,8 @@ $(window).resize(function() {
 $(document).ready(function() {
     $(window).resize();
 });
-setTimeout('Redirect()',<?php echo $refreshTime * 1000;?>);
+setTimeout('Redirect()',refresh);
 setInterval('count()',1000);
-var dest = new Date(<?php echo $destdate*1000; ?>);
 var flipflop=false;
 
 function Redirect()

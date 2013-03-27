@@ -45,58 +45,10 @@ app.get('/', function(req, res) {
                              redscore: $(rowdata[8]).text(),
                              bluescore: $(rowdata[9]).text()});
                  }
-                 var display = "table class='mainTable'><tr class=matchRow><td class=match>Match</td><td class=red>Red Alliance</td><td class=blue>Blue Alliance</td><td class=outcome>Time / Result</td></tr>";
-                 for(var i=0;i<data.length;i++) {
-                   console.log(i);
-                   var row = data[i];
-                   var potential = [row.red1, row.red2, row.red3, row.blue1, row.blue2, row.blue3];
-                   var spot = potential.indexOf(team);
-                   if (spot > -1) {
-                     var redness = spot < 3 ? "myred" : "";
-                     var blueness = spot > 2 ? "myblue" : "";
-                     display+="<tr class=matchRow><td class=match>"+row.match+"</td><td class='red "+redness+"'><table><tr>";
-                     for(var j=0;j<3;j++) {
-                       display+="<td class='oneTeam ";
-                       if (spot == j) {
-                         display += "myTeam";
-                       }
-                       display+="'>"+row["red"+(j+1)]+"</td>";
-                     }
-                     display+="</tr></table></td><td class='blue "+blueness+"'><table><tr>";
-                     for(var j=0;j<3;j++) {
-                       display+="<td class='oneTeam ";
-                       if (spot == j+3) {
-                         display += "myTeam";
-                       }
-                       display+="'>"+row["blue"+(j+1)]+"</td>";
-                     }
-                     display+="</tr></table></td><td class=outcome>";
-
-                     var first = spot < 3 ? "myTeam" : "";
-                     var second = spot > 2 ? "myTeam" : "";
-
-                     if (row.redscore != "" && row.bluescore != "") {
-                       var outcome = "";
-                       if (row.redscore == row.bluescore) {
-                         outcome = "T";
-                       }
-                       else if ((spot < 3 && parseInt(row.redscore) > parseInt(row.bluescore)) ||
-                                (spot > 2 && parseInt(row.redscore) < parseInt(row.bluescore))) {
-                         outcome = "W"
-                       }
-                       else {
-                         outcome = "L";
-                       }
-                       display+="<table><tr><td class='oneTeam "+first+"'>"+row.redscore+"</td><td class='oneTeam "+second+"'>"+row.bluescore+"</td><td class=oneTeam>"+outcome+"</td></tr></table>";
-                     }
-                     else {
-                       display += row.time;
-                     }
-                     display+= "</td></tr>";
-                   }
-                 }
-                 display+="</table";
-                 res.render('display', {disp: display});
+                 dest = 0;
+                 refresh = 30000;
+                 //res.send("<html><head><title>yeah buddy</title></head><body><"+display+"></body></html>");
+                 res.render('display', {team: team, data: data, dest: dest, refresh: refresh});
              });
            }
   );
