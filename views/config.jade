@@ -43,4 +43,8 @@ block content
         input(name="event",type="text",placeholder="casd")
         label Refresh Time (seconds)
         input(name="refresh",type="text",placeholder="30")
+        label.radio Quals
+          input(type="radio",name="elims",value="0",checked)
+        label.radio Elimination
+          input(type="radio",name="elims",value="1")
         button(type="submit", class="btn") Submit
