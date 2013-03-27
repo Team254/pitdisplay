@@ -2,12 +2,20 @@ extends layout
 
 block css
   link(rel='stylesheet',href='http://twitter.github.com/bootstrap/assets/css/bootstrap.css')
+  style
+    .pagination-centered {
+      padding-top: 5px;
+      margin-bottom: -5px;
+    }
 
 block js
   script(type='text/javascript',src='http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js')
   script(type='text/javascript',src='http://twitter.github.com/bootstrap/assets/js/bootstrap.js')
   script
     $(function() {
+      $("button").on('click',function() {
+        $("#config").attr("action",$(this).attr("id"));
+      });
       $("#config").submit(function() {
           $("input[name=team]").each(function(i,v) {
             var t = $(this);
@@ -33,9 +41,9 @@ block js
 
 block content
   .container(style="margin-top:40px;")
-    form(id="config",action="display",method="get",class="well span3 offset4")
+    form(id="config",method="get",class="well span3 offset4")
       fieldset
-        legend 254 Pit Display
+        legend Team 254 Pit Display
         label Team Number
         input(name="team",type="text",placeholder="254")
         label Event Code 
@@ -43,8 +51,12 @@ block content
         input(name="event",type="text",placeholder="casd")
         label Refresh Time (seconds)
         input(name="refresh",type="text",placeholder="30")
+        label (following doesn't affect rankings)
         label.radio Quals
           input(type="radio",name="elims",value="0",checked)
         label.radio Elimination
           input(type="radio",name="elims",value="1")
-        button(type="submit", class="btn") Submit
+        div(class="pagination-centered")
+          .btn-group
+            button(type="submit", class="btn", id="display") Schedule
+            button(type="submit", class="btn", id="rank") Rankings
