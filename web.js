@@ -49,7 +49,10 @@ app.get('/', function(req, res) {
                  res.render('display', {test: test, team: team, data: data, refresh: refresh});
              });
            }
-  );
+  ).on('error', function(e) {
+    console.log("Couldn't connect to FIRST");
+    res.send("Couldn't connect to FIRST",500);
+  });
 });
 
 var port = process.env.PORT || 5000;
