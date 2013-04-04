@@ -61,7 +61,7 @@ app.get('/rank', function(req, res) {
   });
 });
 app.get('/display', function(req, res) {
-  var test = parseInt(req.query.test) || Number.POSITIVE_INFINITY;
+  var test = (req.query.test !== undefined) ? parseInt(req.query.test) : Number.POSITIVE_INFINITY;
   var year = req.query.year || "2013"
   var refresh=parseInt(req.query.refresh)*1000 || 30000;
   var team=req.query.team || "254";
