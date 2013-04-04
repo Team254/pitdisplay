@@ -23,12 +23,6 @@ block js
               t.val(t.attr("placeholder"));
             }
           });
-          $("input[name=event]").each(function(i,v) {
-            var t = $(this);
-            if (t.val() == "") {
-              t.val(t.attr("placeholder"));
-            }
-          });
           $("input[name=refresh]").each(function(i,v) {
             var t = $(this);
             if (t.val() == "") {
@@ -46,9 +40,88 @@ block content
         legend Team 254 Pit Display
         label Team Number
         input(name="team",type="text",placeholder="254")
-        label Event Code 
-          a(href="http://frclinks.frclinks.com/") (options)
-        input(name="event",type="text",placeholder="casj")
+        label Event
+        select(name="event")
+          option(value="txsa") Alamo
+          option(value="orpo") Autodesk Oregon
+          option(value="nhma") BAE Granite State
+          option(value="lake") Bayou
+          option(value="mibed") Bedford FiM
+          option(value="inwl") Boilermaker
+          option(value="mabo") Boston
+          option(value="njbrg") Bridgewater-Raritan MAR
+          option(value="ohcl") Buckeye
+          option(value="cama") Central Valley
+          option(value="wase2") Central Washington
+          option(value="mdba") Chesapeake
+          option(value="code") Colorado
+          option(value="ctha") Connecticut
+          option(value="inth") Crossroads
+          option(value="txda") Dallas
+          option(value="midet") Detroit FiM
+          option(value="qcmo") Festival de Robotique FRC a Montreal
+          option(value="nyro") Finger Lakes
+          option(value="migbl") Grand Blanc FiM
+          option(value="mokc") Greater Kansas City
+          option(value="onto") Greater Toronto East
+          option(value="onto2") Greater Toronto West
+          option(value="migul") Gull Lake FiM
+          option(value="pahat") Hatboro-Horsham MAR
+          option(value="hiho") Hawaii
+          option(value="txlu") Hub City
+          option(value="casb") Inland Empire
+          option(value="ista") Israel
+          option(value="miket") Kettering University FiM
+          option(value="mndu") Lake Superior
+          option(value="nvlv") Las Vegas
+          option(value="njlen") Lenape Seneca MAR
+          option(value="miliv") Livonia FiM
+          option(value="txho") Lone Star
+          option(value="calb") Los Angeles
+          option(value="micmp") Michigan State Championship
+          option(value="mrcmp") Mid-Atlantic Region Championship
+          option(value="ilch") Midwest
+          option(value="mnmi") Minnesota 10000 Lakes
+          option(value="nyny") New York City
+          option(value="ncre") North Carolina
+          option(value="mndu2") Northern Lights
+          option(value="okok") Oklahoma
+          option(value="flor") Orlando
+          option(value="scmb") Palmetto
+          option(value="gadu") Peachtree
+          option(value="azch") Phoenix
+          option(value="mele") Pine Tree
+          option(value="papi") Pittsburgh
+          option(value="ohic") Queen City
+          option(value="arfa") Razorback
+          option(value="casa") Sacramento
+          option(value="casd") San Diego
+          option(value="nyli") SBPLI Long Island
+          option(value="wase") Seattle
+          option(value="casj",selected) Silicon Valley
+          option(value="tnkn") Smoky Mountains
+          option(value="flbr") South Florida
+          option(value="wach") Spokane
+          option(value="paphi") Springside - Chestnut Hill MAR
+          option(value="misjo") St. Joseph FiM
+          option(value="mosl") St. Louis
+          option(value="njewn") TCNJ MAR
+          option(value="mitvc") Traverse City FiM
+          option(value="mitry") Troy FiM
+          option(value="utwv") Utah
+          option(value="vari") Virginia
+          option(value="dcwa") Washington DC
+          option(value="miwfd") Waterford FiM
+          option(value="onwa") Waterloo
+          option(value="miwmi") West Michigan FiM
+          option(value="abca") Western Canadian
+          option(value="wimi") Wisconsin
+          option(value="mawo") WPI
+          option(value="cmp") FIRST Championship
+          option(value="arc") FIRST Championship - Archimedes Division
+          option(value="cur") FIRST Championship - Curie Division
+          option(value="gal") FIRST Championship - Galileo Division
+          option(value="new") FIRST Championship - Newton Division
         label Refresh Time (seconds)
         input(name="refresh",type="text",placeholder="30")
         label (following doesn't affect rankings)
