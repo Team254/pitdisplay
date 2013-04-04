@@ -19,7 +19,7 @@ app.get('/rank', function(req, res) {
   var year = req.query.year || "2013"
   var refresh=parseInt(req.query.refresh)*1000 || 30000;
   var team=req.query.team || "254";
-  var ev=req.query.event || "casd";
+  var ev=req.query.event || "casj";
   var elims=parseInt(req.query.elims) || 0;
   http.get({
             host: "www2.usfirst.org",
