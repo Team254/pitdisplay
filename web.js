@@ -27,7 +27,7 @@ app.get('/casj', function(req, res) {
    console.log(tables);
    var rows = $(table).children();
    var data = [];
-   for(var i=3;i<rows.length;i++) {
+   for(var i=2;i<rows.length;i++) {
      var row = rows[i];
      var rowdata = $(row).children();
      data.push({time: $(rowdata[0]).text(),
