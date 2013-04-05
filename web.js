@@ -1,6 +1,7 @@
 var express = require("express");
 var http = require("http");
 var cheerio = require("cheerio");
+var fs = require("fs");
 
 var app = express.createServer(express.logger());
 app.set('views', __dirname + '/views')
@@ -12,6 +13,36 @@ app.use(express.static(__dirname + '/public'))
 
 app.get('/', function(req, res) {
   res.render('config');
+});
+
+app.get('/casj', function(req, res) {
+  var test = parseInt(req.query.test) || 0;
+  var team=req.query.team || "254";
+  var refresh=parseInt(req.query.refresh)*1000 || 30000;
+  var elims = false;
+  fs.readFile("casj.html", "utf8", function(err,str) {
+   $ = cheerio.load(str);
+   var tables = $("table");
+   var table = elims ? tables[3] : tables[2];
+   console.log(tables);
+   var rows = $(table).children();
+   var data = [];
+   for(var i=3;i<rows.length;i++) {
+     var row = rows[i];
+     var rowdata = $(row).children();
+     data.push({time: $(rowdata[0]).text(),
+               match: $(rowdata[1]).text(),
+               red1: $(rowdata[2+elims]).text(),
+               red2: $(rowdata[3+elims]).text(),
+               red3: $(rowdata[4+elims]).text(),
+               blue1: $(rowdata[5+elims]).text(),
+               blue2: $(rowdata[6+elims]).text(),
+               blue3: $(rowdata[7+elims]).text(),
+               redscore: $(rowdata[8+elims]).text(),
+               bluescore: $(rowdata[9+elims]).text()});
+   }
+   res.render('display', {test: test, team: team, data: data, refresh: refresh});
+  });
 });
 
 app.get('/rank', function(req, res) {
