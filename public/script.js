@@ -68,7 +68,7 @@ function parseTime(timeString) {
 $(window).resize(function() {
         //$("tbody").css("font-size","20px");
     var size=parseInt($("tbody").css("font-size").substr(0,$("tbody").css("font-size").length-2));
-    while($(document).height()>$(window).height()) {
+    while($(document).height()>$(window).height() && size > 20) {
         size=parseInt($("tbody").css("font-size").substr(0,$("tbody").css("font-size").length-2));
         console.log(size);
         console.log($(document).height());
