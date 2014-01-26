@@ -70,9 +70,9 @@ $(window).resize(function() {
     var size=parseInt($("tbody").css("font-size").substr(0,$("tbody").css("font-size").length-2));
     while($(document).height()>$(window).height() && size > 20) {
         size=parseInt($("tbody").css("font-size").substr(0,$("tbody").css("font-size").length-2));
-        console.log(size);
-        console.log($(document).height());
-        console.log($(window).height());
+        console.log("Size: " + size);
+        console.log("Document Height: " + $(document).height());
+        console.log("Window Height: " + $(window).height());
         $("html").css("font-size",(size-1)+"px");
         $("tbody").css("font-size",(size-1)+"px");
         $("tbody").css("font-size",(size-1)+"px");

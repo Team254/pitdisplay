@@ -2,6 +2,7 @@ var express = require("express");
 var http = require("http");
 var cheerio = require("cheerio");
 var fs = require("fs");
+var Topcube = require("topcube")
 
 var app = express.createServer(express.logger());
 app.set('views', __dirname + '/views')
@@ -139,4 +140,11 @@ app.get('/display', function(req, res) {
 var port = process.env.PORT || 5000;
 app.listen(port, function() {
   console.log("Listening on " + port);
+});
+
+Topcube({
+  url: "http://localhost:5000",
+  name: "Pit Display",
+  width: 800,
+  height: 600
 });

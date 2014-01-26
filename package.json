@@ -4,6 +4,7 @@
   "dependencies": {
     "express": "2.5.x",
     "cheerio": "0.10.x",
+    "topcube": "0.2.0",
     "jade": "0.28.x"
   },
   "engines": {
