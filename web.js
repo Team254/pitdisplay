@@ -47,7 +47,7 @@ app.get('/casj', function(req, res) {
 
 app.get('/rank', function(req, res) {
   var test = parseInt(req.query.test) || 0;
-  var year = req.query.year || "2013"
+  var year = req.query.year || "2014"
   var refresh=parseInt(req.query.refresh)*1000 || 30000;
   var team=req.query.team || "254";
   var ev=req.query.event || "casj";
@@ -93,29 +93,31 @@ app.get('/rank', function(req, res) {
 });
 app.get('/display', function(req, res) {
   var test = (req.query.test !== undefined) ? parseInt(req.query.test) : Number.POSITIVE_INFINITY;
-  var year = req.query.year || "2013"
+  var year = req.query.year || "2014"
   var refresh=parseInt(req.query.refresh)*1000 || 30000;
   var team=req.query.team || "254";
-  var ev=req.query.event || "casd";
+  var ev=req.query.event || "casj";
   var elims=parseInt(req.query.elims) ? 1 : 0;
   http.get({
             host: "www2.usfirst.org",
-            path: "/"+year+"comp/events/"+ev+"/matchresults.html"
+            path: "/"+year+"comp/events/"+ev+"/ScheduleQual.html"
            },
            function(response) {
              var str="";
              response.on("data", function(chunk) {
                str += chunk;
+               console.log("swagger");
              });
              response.on('end', function() {
                  $ = cheerio.load(str);
-                 var tables = $("table tbody");
+                 var tables = $("div.Section1 table");
                  var table = elims ? tables[3] : tables[2];
                  var rows = $(table).children();
                  var data = [];
                  for(var i=3;i<rows.length;i++) {
                    var row = rows[i];
                    var rowdata = $(row).children();
+                   console.log(rowdata);
                    data.push({time: $(rowdata[0]).text(),
                              match: $(rowdata[1]).text(),
                              red1: $(rowdata[2+elims]).text(),
@@ -134,6 +136,16 @@ app.get('/display', function(req, res) {
     console.log("Couldn't connect to FIRST");
     res.send("Couldn't connect to FIRST",500);
   });
+});
+app.get('/lights', function(req, res){
+  time = req.query["time"] + "";
+  fs.writeFile("/Users/bg/team254/pitdisplay/test.txt", time, function(err) {
+    if(err) 
+      console.log(err);
+    else 
+      console.log("win");
+    });
+  res.send(time, 500);
 });
 
 var port = process.env.PORT || 5000;
