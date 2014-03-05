@@ -3,6 +3,7 @@ var http = require("http");
 var cheerio = require("cheerio");
 var fs = require("fs");
 
+var lastTime=0;
 var app = express.createServer(express.logger());
 app.set('views', __dirname + '/views')
 app.set('view options', {
@@ -10,7 +11,6 @@ app.set('view options', {
 });
 app.set('view engine', 'jade')
 app.use(express.static(__dirname + '/public'))
-
 app.get('/', function(req, res) {
   res.render('config');
 });
@@ -138,14 +138,37 @@ app.get('/display', function(req, res) {
   });
 });
 app.get('/lights', function(req, res){
-  time = req.query["time"] + "";
-  fs.writeFile("/Users/bg/team254/pitdisplay/test.txt", time, function(err) {
-    if(err) 
-      console.log(err);
-    else 
-      console.log("win");
-    });
-  res.send(time, 500);
+  if(lastTime != req.query["time"]) {
+    text = "gametimer=true," + (req.query["team"] || "blue") 
+      + "," + req.query["time"] 
+      + "\noptions=customize\n " 
+      + "color=0,0,255\n"
+      + "pattern=solid\n"
+      + "fadetime=3,5";
+
+    fs.writefile("/users/bg/team254/pitdisplay/test.txt", time, function(err) {
+      if(err) 
+        console.log(err);
+      else 
+        console.log("win");
+    }); 
+    lastTime = req.query["time"];
+  } else {
+    text = "gametimer=false," + (req.query["team"] || "blue") 
+      + "," + req.query["time"] 
+      + "\noptions=customize\n " 
+      + "color=0,0,255\n"
+      + "pattern=solid\n"
+      + "fadetime=3,5";
+
+    fs.writefile("/users/bg/team254/pitdisplay/test.txt", time, function(err) {
+      if(err) 
+        console.log(err);
+      else 
+        console.log("win");
+    }); 
+  }
+  res.send("", 500);
 });
 
 var port = process.env.PORT || 5000;

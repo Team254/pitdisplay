@@ -1,4 +1,6 @@
 var dest = new Date();
+var hours;
+var minutes;
 function Redirect()
 {
   var request = $.ajax({url: location.href});
@@ -19,8 +21,8 @@ function count() {
         return;
     }
 
-    var hours = Math.floor(diff / 3600);
-    var minutes = Math.floor((diff % 3600) / 60);
+    hours = Math.floor(diff / 3600);
+    minutes = Math.floor((diff % 3600) / 60);
     var seconds = Math.floor(diff % 60);
     if(hours<10) {
         hours="0"+hours;
@@ -43,6 +45,11 @@ function count() {
         $("#countdown").css("background-color","red");
     } else if (diff <= 600) {
         $("#countdown").css("background-color","gold");
+    }
+}
+function updateFile() {
+    if(hours == 0 && minutes < 10) {
+      $.ajax("/lights?time="+minutes);
     }
 }
 function parseTime(timeString) {    
@@ -83,6 +90,8 @@ $(window).resize(function() {
         $(".red").css("padding",(size-1)/8*3+"px");
         $(".outcome").css("padding",(size-1)/8*3+"px");
         $("#countdown").css("padding",(size-1)/8*3+"px");
+        $(".link").css("padding",(size-1)/8*3+"px");
+
     }
 });
 $(function() {
@@ -98,7 +107,9 @@ $(function() {
 
   setTimeout('Redirect()',refresh);
   setInterval('count()',1000);
+  setInterval('updateFile()', 5000);
   var flipflop=false;
 
   count();
 });
+
