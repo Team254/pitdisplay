@@ -11,6 +11,8 @@ app.set('view options', {
 });
 app.set('view engine', 'jade')
 app.use(express.static(__dirname + '/public'))
+app.use(express.bodyParser());
+
 app.get('/', function(req, res) {
   res.render('config');
 });
@@ -137,38 +139,51 @@ app.get('/display', function(req, res) {
     res.send("Couldn't connect to FIRST",500);
   });
 });
-app.get('/lights', function(req, res){
-  if(lastTime != req.query["time"]) {
-    text = "gametimer=true," + (req.query["team"] || "blue") 
-      + "," + req.query["time"] 
-      + "\noptions=customize\n " 
-      + "color=0,0,255\n"
-      + "pattern=solid\n"
-      + "fadetime=3,5";
 
-    fs.writefile("/users/bg/team254/pitdisplay/test.txt", time, function(err) {
-      if(err) 
-        console.log(err);
-      else 
-        console.log("win");
-    }); 
-    lastTime = req.query["time"];
-  } else {
-    text = "gametimer=false," + (req.query["team"] || "blue") 
-      + "," + req.query["time"] 
-      + "\noptions=customize\n " 
-      + "color=0,0,255\n"
-      + "pattern=solid\n"
-      + "fadetime=3,5";
 
-    fs.writefile("/users/bg/team254/pitdisplay/test.txt", time, function(err) {
-      if(err) 
-        console.log(err);
-      else 
-        console.log("win");
-    }); 
+var options;
+var color;
+var pattern;
+var fadetimes;
+
+app.post('/lights', function(req, res){
+  var isGameTimerOn = false;
+
+  console.log(req);
+  if(req.body.options && req.body.options != options) {
+    options = req.body.options;
   }
-  res.send("", 500);
+  if(req.body.color && req.body.color != color) {
+    color = req.body.color;
+  }
+  if(req.body.pattern && req.body.pattern != pattern) {
+    pattern = req.body.pattern;
+  }
+  if(req.body.fadetimes && req.body.fadetimes != fadetimes) {
+    fadetimes = req.body.fadetimes;
+  }
+
+  if(req.body.time && lastTime != req.body.time) {
+    isGameTimerOn = true;
+    lastTime = req.body.time;
+  } else {
+    isGameTimerOn = false;
+  }
+  text = "gametimer=" + isGameTimerOn + "," + (req.body.team || "blue")
+  + "," + (req.body.time || 0)
+  + "\noptions=" + options+ "\n "
+  + "color=" + color + "\n"
+  + "pattern="+pattern+"\n"
+  + "fadetime="+fadetimes+"";
+
+  fs.writeFile(__dirname +  "/test.txt", text, function(err) {
+    if(err) {
+      console.log(err);
+    } else {
+      console.log("win");
+    }
+  });
+  res.send("", 200);
 });
 
 var port = process.env.PORT || 5000;
