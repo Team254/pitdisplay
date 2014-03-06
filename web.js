@@ -135,13 +135,19 @@ app.get('/display', function(req, res) {
   });
 });
 
-
 var options;
 var color;
 var pattern;
 var fadetimes;
 
+app.all('*', function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  next();
+});
 app.post('/lights', function(req, res){
+
   console.log(req.body);
   var isGameTimerOn = false;
 
@@ -166,7 +172,7 @@ app.post('/lights', function(req, res){
   }
   text = "gametimer=" + isGameTimerOn + "," + (req.body.team || "blue")
   + "," + (req.body.time || 0)
-  + "\noptions=" + options+ "\n "
+  + "\noptions=" + options+ "\n"
   + "color=" + color + "\n"
   + "pattern="+pattern+"\n"
   + "fadetime="+fadetimes+"";
@@ -178,7 +184,9 @@ app.post('/lights', function(req, res){
       console.log("win");
     }
   });
-  res.send("", 200);
+
+  res.setHeader("Access-Control-Max-Age", "1728000");
+  res.send("asdf", 200)
 });
 
 var port = process.env.PORT || 5000;
