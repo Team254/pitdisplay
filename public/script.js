@@ -84,12 +84,12 @@ function parseTime(timeString) {
 }
 function aLink() {
   if(document.location.pathname === "/display") {
-    link = "http://localhost:5000/rank?team=" + gqv("team")
+    link = "http://"+document.location.host+"/rank?team=" + gqv("team")
             + "&event="+gqv("event")
             + "&refresh=" + gqv("refresh")
             + "&elims=" + gqv("elims");
   } else {
-    link = "http://localhost:5000/display?team=" + gqv("team")
+    link = "http://"+document.location.host+"/display?team=" + gqv("team")
             + "&event="+gqv("event")
             + "&refresh=" + gqv("refresh")
             + "&elims=" + gqv("elims");
