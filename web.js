@@ -75,12 +75,13 @@ app.get('/rank', function(req, res) {
                    data.push({rank: $(rowdata[0]).text(),
                              team: $(rowdata[1]).text(),
                              qs: $(rowdata[2]).text(),
-                             ap: $(rowdata[3]).text(),
-                             cp: $(rowdata[4]).text(),
-                             tp: $(rowdata[5]).text(),
-                             record: $(rowdata[6]).text(),
-                             dq: $(rowdata[7]).text(),
-                             played: $(rowdata[8]).text()});
+                             assist: $(rowdata[3]).text(),
+                             ap: $(rowdata[4]).text(),
+                             tc: $(rowdata[5]).text(),
+                             tp: $(rowdata[6]).text(),
+                             record: $(rowdata[7]).text(),
+                             dq: $(rowdata[8]).text(),
+                             played: $(rowdata[9]).text()});
                  }
                  res.render('rank', {test: test, team: team, data: data, refresh: refresh});
              });
