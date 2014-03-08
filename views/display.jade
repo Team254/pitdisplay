@@ -15,7 +15,8 @@ block content
       td.match Match
       td.red Red Alliance
       td.blue Blue Alliance
-      td.outcome Time / Result
+      td.outcome Time / 
+        a.link Result
     - var count = 0;
     - each row in data
       - var potential = [row.red1, row.red2, row.red3, row.blue1, row.blue2, row.blue3]
@@ -56,6 +57,5 @@ block content
                   td(class="oneTeam") #{outcome}
             - else
               div.time #{row.time}
-
 
   #countdown
