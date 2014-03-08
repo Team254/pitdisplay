@@ -90,8 +90,6 @@ $(window).resize(function() {
         $(".red").css("padding",(size-1)/8*3+"px");
         $(".outcome").css("padding",(size-1)/8*3+"px");
         $("#countdown").css("padding",(size-1)/8*3+"px");
-        $(".link").css("padding",(size-1)/8*3+"px");
-
     }
 });
 $(function() {
