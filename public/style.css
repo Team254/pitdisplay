@@ -1,6 +1,10 @@
 html, tbody {
-  font-size: 40px;
+  font-size: 2.5em;
 }
+a {color:#0D309B;}      /* unvisited link */
+a:visited {color:#0D309B;}  /* visited link */
+a:hover {color:#0D309B;}  /* mouse over link */
+a:active {color:#0D309B;}
 body {
   background: #fff;
   font-family: helvetica, arial, verdana, sans-serif;
