@@ -20,7 +20,7 @@ def main
         end
       end
       event_name = swag.css('td b').to_s.scan(/<b>(.*)<\/b>/).join("")
-      option(event_init, event_name)
+      option event_init, event_name
     end
 
    # Nokogiri::HTML(open(link))

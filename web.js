@@ -99,7 +99,7 @@ app.get('/display', function(req, res) {
   var elims=parseInt(req.query.elims) ? 1 : 0;
   http.get({
             host: "www2.usfirst.org",
-            path: "/"+year+"comp/events/"+ev+"/ScheduleQual.html"
+            path: "/"+year+"comp/events/"+ev+"/matchresults.html"
            },
            function(response) {
              var str="";
@@ -108,13 +108,14 @@ app.get('/display', function(req, res) {
              });
              response.on('end', function() {
                  $ = cheerio.load(str);
-                 var tables = $("div.Section1 table");
+                 var tables = $("table tbody");
                  var table = elims ? tables[3] : tables[2];
                  var rows = $(table).children();
                  var data = [];
                  for(var i=3;i<rows.length;i++) {
                    var row = rows[i];
                    var rowdata = $(row).children();
+                   console.log(rowdata);
                    data.push({time: $(rowdata[0]).text(),
                              match: $(rowdata[1]).text(),
                              red1: $(rowdata[2+elims]).text(),
@@ -125,6 +126,7 @@ app.get('/display', function(req, res) {
                              blue3: $(rowdata[7+elims]).text(),
                              redscore: $(rowdata[8+elims]).text(),
                              bluescore: $(rowdata[9+elims]).text()});
+                 
                  }
                  res.render('display', {test: test, team: team, data: data, refresh: refresh});
              });
