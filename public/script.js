@@ -1,6 +1,8 @@
 var dest = new Date();
 var hours;
 var minutes;
+var color = "blue";
+var lastmins;
 
 function Redirect()
 {
@@ -59,8 +61,13 @@ function gqv(variable) {
   }
 }
 function updateFile() {
-  if(hours == 0 && minutes < 10) {
-    $.ajax("/lights?time="+minutes);
+  if (lastmins == null || lastmins == ""){
+    lastmins = parseInt(minutes) + 1;
+  }
+  if(hours == 0 && minutes < 10 && minutes == (lastmins - 1)) {
+    lastmins = parseInt(minutes);
+    $.post("http://localhost:5000/lights", {"time" : minutes, "timecolor" : color});
+    console.log({"time" : minutes, "timecolor" : color})
   }
 }
 function parseTime(timeString) {    
@@ -117,13 +124,35 @@ $(window).resize(function() {
 $(function() {
   $(window).resize();
   var latch = false;
-  $("div.time").each(function(i, val) {
+  var tmpcolor = "blue";
+  $("tr.matchRow").each(function(index){
+    var d = parseTime($(this).find(".outcome").find(".time").text());
+    //console.log(d);
+      $(this).find("td").each(function(indext){
+        if (indext == 2){
+          if ($(this).parent().parent().parent().parent().attr("class") == "red myred"){
+            //console.log("red");
+            tmpcolor = "red";
+          } else {
+            tmpcolor = "blue";
+            //console.log("blue");
+            //console.log($(this).parent().parent().parent().parent().attr("class"));
+          }
+        } 
+      });
+    if (!latch && d > new Date()) {
+      color = tmpcolor;
+      dest = d;
+      latch = true;
+    }
+  });
+/*  $("div.time").each(function(i, val) {
     var d = parseTime($(val).text());
     if (!latch && d > new Date()) {
       dest = d;
       latch = true;
     }
-  });
+  });*/
   aLink();
   setTimeout('Redirect()',refresh);
   setInterval('count()',1000);

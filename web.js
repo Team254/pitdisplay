@@ -2,6 +2,12 @@ var express = require("express");
 var http = require("http");
 var cheerio = require("cheerio");
 var fs = require("fs");
+var currentcolor = "c,0,0,255,solid,1,1:"; var coloroveride = false; var lastcolor = "c,0,0,255,solid,1,1:";
+var SerialPort = require("serialport").SerialPort
+var serialPort = new SerialPort("/dev/tty.usbmodemfd121", {
+  baudrate: 9600
+});
+
 
 var lastTime=0;
 var app = express.createServer(express.logger());
@@ -91,6 +97,19 @@ app.get('/rank', function(req, res) {
     res.send("Couldn't connect to FIRST",500);
   });
 });
+app.get('/kill', function(req, res) {
+  if (coloroveride){
+    coloroveride = false;
+    res.write("TURNED OFF COLOR OVERIDE. RELOAD TO TURN ON");
+    displaycolor(lastcolor);
+  } else {
+    coloroveride = true;
+    lastcolor = currentcolor;
+    res.write("TURNED ON COLOR OVERIDE. RELOAD TO TURN OFF");
+    displaycolor("c,0,0,255,solid,1,1:");
+  }
+  res.end();
+});
 app.get('/display', function(req, res) {
   var test = (req.query.test !== undefined) ? parseInt(req.query.test) : Number.POSITIVE_INFINITY;
   var year = req.query.year || "2014"
@@ -170,24 +189,44 @@ app.post('/lights', function(req, res){
   if(req.body.time && lastTime != req.body.time) {
     isGameTimerOn = true;
     lastTime = req.body.time;
+    lastcolor = currentcolor;
+    var coloroverideoveride = false;
+    if (coloroveride){
+      //There was already an overide in place
+      coloroverideoveride = true;
+    } else {
+      coloroverideoveride = false;
+    }
+    coloroveride = true;
+    if (req.body.timecolor == "red"){
+      displaycolor("c,255,0,0,flash,1,1:");
+    } else {
+      displaycolor("c,0,0,255,flash,1,1:");
+    }
+    console.log("===========GOT A TIME REQUEST============");
+    setTimeout(function(){if (!coloroverideoveride){coloroveride = false}; displaycolor(lastcolor)}, (lastTime * 1000));
   } else {
     isGameTimerOn = false;
   }
-  text = "gametimer=" + isGameTimerOn + "," + (req.body.team || "blue")
+
+  /*text = "gametimer=" + isGameTimerOn + "," + (req.body.team || "blue")
   + "," + (req.body.time || 0)
   + "\noptions=" + options+ "\n"
   + "color=" + color + "\n"
   + "pattern="+pattern+"\n"
   + "fadetime="+fadetimes+"";
-  path = "C:\\PitDisplayConfiguration\\PitDsiplayColorConfig.txt";
+  path = "/Users/ryanjohnson/Documents/Coding/pitbox/pit.txt";
+  //path = "C:\\PitDisplayConfiguration\\PitDsiplayColorConfig.txt";
   fs.writeFile(path, text, function(err) {
     if(err) {
       console.log(err);
     } else {
       console.log("win");
     }
-  });
-
+  });*/
+  if (!coloroveride){
+    displaycolor(options.substring(0,1) + "," + color + "," + pattern + "," + fadetimes + ":");
+  }
   res.setHeader("Access-Control-Max-Age", "1728000");
   res.send("asdf", 200)
 });
@@ -196,3 +235,13 @@ var port = process.env.PORT || 5000;
 app.listen(port, function() {
   console.log("Listening on " + port);
 });
+function displaycolor(colorstring){
+  console.log(colorstring);
+  currentcolor = colorstring;
+  serialPort.open(function () {
+    serialPort.write(colorstring, function(err, results) {
+      console.log('!!!!!err ' + err);
+      console.log('results ' + results);
+    });
+  });
+}
