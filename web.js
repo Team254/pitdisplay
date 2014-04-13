@@ -4,9 +4,25 @@ var cheerio = require("cheerio");
 var fs = require("fs");
 var currentcolor = "c,0,0,255,solid,1,1:"; var coloroveride = false; var lastcolor = "c,0,0,255,solid,1,1:";
 var SerialPort = require("serialport").SerialPort
-var serialPort = new SerialPort("/dev/tty.usbmodemfd121", {
-  baudrate: 9600
-});
+try {
+  var serialPort = new SerialPort("/dev/tty.usbmodemfd121", { //COM PORT HERE
+    baudrate: 9600
+  });
+} catch (err){
+  try {
+    var serialPort = new SerialPort("COM 4", { //COM PORT HERE
+      baudrate: 9600
+    });
+  } catch (err){
+    try{
+      var serialPort = new SerialPort("/dev/tty.usbmodem411", { //COM PORT HERE
+        baudrate: 9600
+      });
+    } catch(error) {
+      console.log("============================\n\n\n\nTHE ARDUINO NO WORK!!!!!! ERROR:" + error);
+    }
+  }
+}
 
 
 var lastTime=0;

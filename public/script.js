@@ -66,7 +66,7 @@ function updateFile() {
   }
   if(hours == 0 && minutes < 10 && minutes == (lastmins - 1)) {
     lastmins = parseInt(minutes);
-    $.post("http://localhost:5000/lights", {"time" : minutes, "timecolor" : color});
+    $.post("http://localhost:5000/lights", {"time" : (minutes + 1), "timecolor" : color});
     console.log({"time" : minutes, "timecolor" : color})
   }
 }
