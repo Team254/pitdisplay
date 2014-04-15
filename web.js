@@ -1,32 +1,31 @@
 var express = require("express");
+var colors = require('colors');
 var http = require("http");
 var cheerio = require("cheerio");
 var fs = require("fs");
-var currentcolor = "c,0,0,255,solid,1,1:"; var coloroveride = false; var lastcolor = "c,0,0,255,solid,1,1:";
+var currentcolor = "c,0,0,255,solid,1,1:"; var coloroveride = false; var lastcolor = "c,0,0,255,solid,1,1:"; var pattern="fade";
 var SerialPort = require("serialport").SerialPort
+
+var port = "";
+process.argv.forEach(function (val, index, array) {
+  if (index == 2){
+    console.log('[info]'.blue +': Arduino on port: ' + val);
+    port = val;
+  }
+});
+
 try {
-  var serialPort = new SerialPort("/dev/tty.usbmodemfd121", { //COM PORT HERE
-    baudrate: 9600
+  var serialPort = new SerialPort(port, { //COM PORT HERE
+    baudrate: 115200
   });
 } catch (err){
-  try {
-    var serialPort = new SerialPort("COM 4", { //COM PORT HERE
-      baudrate: 9600
-    });
-  } catch (err){
-    try{
-      var serialPort = new SerialPort("/dev/tty.usbmodem411", { //COM PORT HERE
-        baudrate: 9600
-      });
-    } catch(error) {
-      console.log("============================\n\n\n\nTHE ARDUINO NO WORK!!!!!! ERROR:" + error);
-    }
-  }
+      console.log("[FATAL]".red + ": THE ARDUINO DOES NOT WORK")
+      console.log("         ---> ERROR: " + err + " PORT SPECIFIED: " + port);
 }
 
 
 var lastTime=0;
-var app = express.createServer(express.logger());
+var app = express.createServer(); //express.logger()
 app.set('views', __dirname + '/views')
 app.set('view options', {
       layout: false
@@ -93,7 +92,7 @@ app.get('/rank', function(req, res) {
                  for(var i=0;i<rows.length;i++) {
                    var row = rows[i];
                    var rowdata = $(row).children();
-                   console.log("HELLA "+i);
+                   //console.log("HELLA "+i);
                    data.push({rank: $(rowdata[0]).text(),
                              team: $(rowdata[1]).text(),
                              qs: $(rowdata[2]).text(),
@@ -117,12 +116,12 @@ app.get('/kill', function(req, res) {
   if (coloroveride){
     coloroveride = false;
     res.write("TURNED OFF COLOR OVERIDE. RELOAD TO TURN ON");
-    displaycolor(lastcolor);
+    displaycolor(lastcolor, true);
   } else {
     coloroveride = true;
     lastcolor = currentcolor;
     res.write("TURNED ON COLOR OVERIDE. RELOAD TO TURN OFF");
-    displaycolor("c,0,0,255,solid,1,1:");
+    displaycolor("c,0,0,255,solid,1,1:", true);
   }
   res.end();
 });
@@ -151,7 +150,7 @@ app.get('/display', function(req, res) {
                  for(var i=3;i<rows.length;i++) {
                    var row = rows[i];
                    var rowdata = $(row).children();
-                   console.log(rowdata);
+                   //console.log(rowdata);
                    data.push({time: $(rowdata[0]).text(),
                              match: $(rowdata[1]).text(),
                              red1: $(rowdata[2+elims]).text(),
@@ -185,10 +184,9 @@ app.all('*', function(req, res, next) {
   next();
 });
 app.post('/lights', function(req, res){
-
-  console.log(req.body);
+  console.log("==============[Time: ".green + new Date().getHours() + ":" + new Date().getMinutes() + ":" + new Date().getSeconds() + " Mode: " + req.body.options + ", " + req.body.pattern + "]=============".green );
   var isGameTimerOn = false;
-
+  pattern = req.body.pattern;
   if(req.body.options && req.body.options != options) {
     options = req.body.options;
   }
@@ -206,7 +204,7 @@ app.post('/lights', function(req, res){
     isGameTimerOn = true;
     lastTime = req.body.time;
     lastcolor = currentcolor;
-    var coloroverideoveride = false;
+    coloroverideoveride = false;
     if (coloroveride){
       //There was already an overide in place
       coloroverideoveride = true;
@@ -215,11 +213,11 @@ app.post('/lights', function(req, res){
     }
     coloroveride = true;
     if (req.body.timecolor == "red"){
-      displaycolor("c,255,0,0,flash,1,1:");
+      displaycolor("c,255,0,0,flash,1,1:", (lastcolor.substring(0,1) != "c" || pattern == "fade"));
     } else {
-      displaycolor("c,0,0,255,flash,1,1:");
+      displaycolor("c,0,0,255,flash,1,1:", (lastcolor.substring(0,1) != "c" || pattern == "fade"));
     }
-    console.log("===========GOT A TIME REQUEST============");
+    console.log("[info]".blue +": GOT A TIME REQUEST".green);
     setTimeout(function(){if (!coloroverideoveride){coloroveride = false}; displaycolor(lastcolor)}, (lastTime * 1000));
   } else {
     isGameTimerOn = false;
@@ -241,7 +239,13 @@ app.post('/lights', function(req, res){
     }
   });*/
   if (!coloroveride){
-    displaycolor(options.substring(0,1) + "," + color + "," + pattern + "," + fadetimes + ":");
+    currentcolor = (options.substring(0,1) + "," + color + "," + pattern + "," + fadetimes + ":");
+    if (lastcolor.substring(0,1) != "c" && currentcolor.substring(0,1) == "c"){
+      displaycolor(options.substring(0,1) + "," + color + "," + pattern + "," + fadetimes + ":", true);
+    } else {
+      displaycolor(options.substring(0,1) + "," + color + "," + pattern + "," + fadetimes + ":");
+    }
+    lastcolor = currentcolor;
   }
   res.setHeader("Access-Control-Max-Age", "1728000");
   res.send("asdf", 200)
@@ -249,15 +253,46 @@ app.post('/lights', function(req, res){
 
 var port = process.env.PORT || 5000;
 app.listen(port, function() {
-  console.log("Listening on " + port);
+  console.log("[info]".blue +"".blue+": Listening on " + port);
 });
-function displaycolor(colorstring){
-  console.log(colorstring);
+function displaycolor(colorstring, doubletime){
+  try{
+    if (doubletime){
+      
+      console.log("[info]".blue +": Doing a doubletime of " + 1000 + " ms. Just for dev purposes, doubletime = " + doubletime);
+      doubletime = 1000;
+      console.log("[info]".blue +": Sent to arduino: " + colorstring);
+      currentcolor = colorstring;
+      setTimeout(function(){
+        try{
+        console.log("[info]".blue +": Sent to arduino: " + colorstring);
+        serialPort.open(function () {
+          serialPort.write(colorstring, function(err, results) {
+            console.log('[warn]'.warn +': Arduino Serial error in serialPort.write. Probably not fatal' + err);
+            console.log('[info]'.blue +': Serial Results: ' + results);
+          });
+        });
+        } catch(error){
+          console.log("[FATAL]".red + ": SerialWrite Error: " + error);
+        }
+      }, 1000);
+      serialPort.open(function () {
+        serialPort.write(colorstring, function(err, results) {
+          console.log('!!!!!err ' + err);
+          console.log('results ' + results);
+        });
+      });
+    } else {
+      console.log("[info]".blue +": Sent to arduino: " + colorstring);
+      serialPort.open(function () {
+        serialPort.write(currentcolor, function(err, results) {
+          console.log('[warn]'.warn +': Arduino Serial error in serialPort.write. Probably not fatal' + err);
+          console.log('[info]'.blue +': Serial Results: ' + results);
+        });
+      });
+    }
+  } catch (error){
+    console.log("[FATAL]".red + ": SerialWrite Error: " + error);
+  }
   currentcolor = colorstring;
-  serialPort.open(function () {
-    serialPort.write(colorstring, function(err, results) {
-      console.log('!!!!!err ' + err);
-      console.log('results ' + results);
-    });
-  });
 }
