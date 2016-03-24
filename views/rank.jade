@@ -15,13 +15,12 @@ block content
       td.rank 
         a Rank
       td.rank Team
-      td.rank QS
-      td.rank ASSIST
-      td.rank AP
-      td.rank TC
-      td.rank TP
+      td.rank RS
+      td.rank Auto
+      td.rank Scale/Challenge
+      td.rank Goals
+      td.rank Defense
       td.record Record
-      td.rank DQ
       td.rank Played
     - var max = 10;
     - var num = Math.min(max,data.length);
@@ -35,13 +34,12 @@ block content
       tr.matchRow
         td(class="rank #{myrow}")= row.rank
         td(class="rank #{myrow}")= row.team
-        td(class="rank #{myrow}")= row.qs
-        td(class="rank #{myrow}")= row.assist
-        td(class="rank #{myrow}")= row.ap
-        td(class="rank #{myrow}")= row.tc
-        td(class="rank #{myrow}")= row.tp
+        td(class="rank #{myrow}")= row.rs
+        td(class="rank #{myrow}")= row.auto
+        td(class="rank #{myrow}")= row.scale
+        td(class="rank #{myrow}")= row.goals
+        td(class="rank #{myrow}")= row.defense
         td(class="record #{myrow}")= row.record
-        td(class="rank #{myrow}")= row.dq
         td(class="rank #{myrow}")= row.played
     - if(!found)
       - for(var i=num;i<data.length;i++)

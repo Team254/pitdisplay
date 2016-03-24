@@ -69,14 +69,14 @@ app.get('/casj', function(req, res) {
 
 app.get('/rank', function(req, res) {
   var test = parseInt(req.query.test) || 0;
-  var year = req.query.year || "2014"
+  var year = req.query.year || "2016"
   var refresh=parseInt(req.query.refresh)*1000 || 30000;
   var team=req.query.team || "254";
   var ev=req.query.event || "casj";
   var elims=parseInt(req.query.elims) || 0;
   http.get({
-            host: "www2.usfirst.org",
-            path: "/"+year+"comp/events/"+ev+"/rankings.html"
+            host: "frc-events.firstinspires.org",
+            path: "/"+year+"/"+ev+"/rankings"
            },
            function(response) {
              var str="";
@@ -84,27 +84,29 @@ app.get('/rank', function(req, res) {
                str += chunk;
              });
              response.on('end', function() {
-                 $ = cheerio.load(str);
+                 $ = cheerio.load(str);     
                  var tables = $("table tbody");
-                 var table = tables[2];
-                 var rows = $($(table).children()[3]).children();
+                 var table = tables[0];
+                 var rows = $(table).children();
                  var data = [];
                  for(var i=0;i<rows.length;i++) {
                    var row = rows[i];
                    var rowdata = $(row).children();
-                   //console.log("HELLA "+i);
-                   data.push({rank: $(rowdata[0]).text(),
+                   if(rowdata.length>=9) {
+                   		var gameTime = $(rowdata[1]).text().trim();
+                  		data.push({rank: $(rowdata[0]).text(),
                              team: $(rowdata[1]).text(),
-                             qs: $(rowdata[2]).text(),
-                             assist: $(rowdata[3]).text(),
-                             ap: $(rowdata[4]).text(),
-                             tc: $(rowdata[5]).text(),
-                             tp: $(rowdata[6]).text(),
+                             rs: $(rowdata[2]).text(),
+                             auto: $(rowdata[3]).text(),
+                             scale: $(rowdata[4]).text(),
+                             goals: $(rowdata[5]).text(),
+                             defense: $(rowdata[6]).text(),
                              record: $(rowdata[7]).text(),
-                             dq: $(rowdata[8]).text(),
-                             played: $(rowdata[9]).text()});
+                             played: $(rowdata[8]).text()});
+                  	}	
                  }
                  res.render('rank', {test: test, team: team, data: data, refresh: refresh});
+
              });
            }
   ).on('error', function(e) {
@@ -127,14 +129,14 @@ app.get('/kill', function(req, res) {
 });
 app.get('/display', function(req, res) {
   var test = (req.query.test !== undefined) ? parseInt(req.query.test) : Number.POSITIVE_INFINITY;
-  var year = req.query.year || "2014"
+  var year = req.query.year || "2016"
   var refresh=parseInt(req.query.refresh)*1000 || 30000;
   var team=req.query.team || "254";
   var ev=req.query.event || "casj";
   var elims=parseInt(req.query.elims) ? 1 : 0;
   http.get({
-            host: "www2.usfirst.org",
-            path: "/"+year+"comp/events/"+ev+"/matchresults.html"
+            host: "frc-events.firstinspires.org",
+            path: "/"+year+"/"+ev+"/" + (elims ? "playoffs" : "qualifications")
            },
            function(response) {
              var str="";
@@ -144,24 +146,28 @@ app.get('/display', function(req, res) {
              response.on('end', function() {
                  $ = cheerio.load(str);
                  var tables = $("table tbody");
-                 var table = elims ? tables[3] : tables[2];
+                 var table = tables[0];
                  var rows = $(table).children();
                  var data = [];
-                 for(var i=3;i<rows.length;i++) {
+                 for(var i=0;i<rows.length;i++) {
                    var row = rows[i];
                    var rowdata = $(row).children();
-                   //console.log(rowdata);
-                   data.push({time: $(rowdata[0]).text(),
-                             match: $(rowdata[1]).text(),
-                             red1: $(rowdata[2+elims]).text(),
-                             red2: $(rowdata[3+elims]).text(),
-                             red3: $(rowdata[4+elims]).text(),
-                             blue1: $(rowdata[5+elims]).text(),
-                             blue2: $(rowdata[6+elims]).text(),
-                             blue3: $(rowdata[7+elims]).text(),
-                             redscore: $(rowdata[8+elims]).text(),
-                             bluescore: $(rowdata[9+elims]).text()});
-                 
+                   if(rowdata.length>=9) {
+                   		var gameTime = $(rowdata[1]).text().trim();
+	                   data.push({
+	                   			//time: gameTime.substr(gameTime.indexOf("-") + 2),
+	                   			time: gameTime,
+	                   			match: $(rowdata[0]).text().trim(),
+								red1: $(rowdata[2]).text().trim(),
+								red2: $(rowdata[3]).text().trim(),
+								red3: $(rowdata[4]).text().trim(),
+								blue1: $(rowdata[5]).text().trim(),
+								blue2: $(rowdata[6]).text().trim(),
+								blue3: $(rowdata[7]).text().trim(),
+								redscore: $(rowdata[8]).text().trim(),
+								bluescore: $(rowdata[9]).text().trim()
+						});
+             	   }
                  }
                  res.render('display', {test: test, team: team, data: data, refresh: refresh});
              });
