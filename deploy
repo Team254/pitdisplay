@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -e
+
+USER=team254
+HOST=ec2.team254.com
+APP=pitdisplay
+SCRIPT_NAME=pitdisplay
+
+echo "Deploying $APP from Git master branch..."
+echo
+ssh $USER@$HOST "cd /opt/sites/$APP && git checkout -f && git pull && npm install && node web.js"
+echo
+echo "Deployed $APP."
