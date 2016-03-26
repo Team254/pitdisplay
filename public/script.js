@@ -91,12 +91,12 @@ function parseTime(timeString) {
 }
 function aLink() {
   if(document.location.pathname === "/display") {
-    link = "http://"+document.location.host+"/rank?team=" + gqv("team")
+    link = document.location.protocol + "//" + document.location.host + "/rank?team=" + gqv("team")
             + "&event="+gqv("event")
             + "&refresh=" + gqv("refresh")
             + "&elims=" + gqv("elims");
   } else {
-    link = "http://"+document.location.host+"/display?team=" + gqv("team")
+    link = document.location.protocol + "//" + document.location.host + "/display?team=" + gqv("team")
             + "&event="+gqv("event")
             + "&refresh=" + gqv("refresh")
             + "&elims=" + gqv("elims");
