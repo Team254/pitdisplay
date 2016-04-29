@@ -1,0 +1,116 @@
+body{
+    margin:0px;
+    font-family:sans-serif;
+}
+header{
+    background-color: #0070FF;
+    padding:10px;
+}
+header h1{
+    display:inline-block;
+    color:#FFF;
+    margin:0px;
+}
+header div.controls{
+    float:right;
+}
+header div.controls #team{
+    border:1px solid #FFF;
+    border-radius:5px;
+    padding:3px;
+    color:#FFF;
+    background: rgba(0,0,0,0);
+    outline:none;
+}
+::-webkit-input-placeholder {
+    color: #FFF;
+}
+#rankings{
+    float:right;
+}
+#schedule{
+    float:left;
+}
+.content{
+    padding:10px;
+}
+#schedule table, #rankings table{
+    border-spacing: 0px;
+    border-collapse: separate;
+}
+
+#schedule table {
+    font-size:1.6em;
+}
+
+#schedule table tr:first-child, #rankings table tr:first-child{
+    color:#FFF;
+}
+#schedule table tr td, #rankings table tr td{
+    padding:.33em;
+}
+#schedule table tr:first-child td, #rankings table tr:first-child td{
+    background-color:#000;
+}
+#schedule table tr:first-child td:first-child, #rankings table tr:first-child td:first-child{
+    border-top-left-radius: 5px;
+}
+#schedule table tr:first-child td:last-child, #rankings table tr:first-child td:last-child{
+    border-top-right-radius: 5px;
+}
+#schedule table tr:nth-child(even), #rankings table tr:nth-child(even){
+    background-color:#EEE;
+}
+
+/*Colored Parts*/
+#schedule table tr:nth-child(n+2):nth-child(even) td:nth-child(n+3):nth-child(-n+5){
+    background-color:#FF3333;
+}
+#schedule table tr:nth-child(n+2):nth-child(odd) td:nth-child(n+3):nth-child(-n+5){
+    background-color:#FF6363;
+}
+#schedule table tr:nth-child(n+2):nth-child(even) td:nth-child(n+6):nth-child(-n+8){
+    background-color:#0070FF;
+}
+#schedule table tr:nth-child(n+2):nth-child(odd) td:nth-child(n+6):nth-child(-n+8){
+    background-color:#549FFF;
+}
+
+
+#schedule table tr:nth-child(1) td:nth-child(n+3):nth-child(-n+2){
+    background-color:#FF0000;
+}
+#schedule table tr:nth-child(1) td:nth-child(n+6):nth-child(-n+2){
+    background-color:#0070FF;
+}
+
+/*#schedule table tr:nth-child(even) td:nth-child(n+3):nth-child(-n+2){
+    background-color:#FDD;
+}
+#schedule table tr:nth-child(even) td:nth-child(n+6):nth-child(-n+2){
+    background-color:#DDF;
+}*/
+#lag {
+    font-size:1.5em;
+    text-align:center;
+}
+#timer {
+    font-size:2.3em;
+    font-weight:600;
+    text-transform: uppercase;
+    text-align:center;
+    padding:10px;
+    border-radius:5px;
+    margin:20px;
+    background-color:#0070FF;
+    color:#FFF;
+}
+#timer.green{
+    background-color:rgb(76, 175, 80);
+}
+#timer.red{
+    background-color:#d50000
+}
+#timer.yellow{
+    background-color:#FF9800
+}

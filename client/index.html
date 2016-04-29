@@ -1,0 +1,283 @@
+<html>
+    <head>
+        <title>Pit</title>
+        <script src="socket.io.js"></script>
+        <script src="jquery.js"></script>
+        <link rel="stylesheet" type="text/css" href="main.css">
+    </head>
+    <body>
+        <header>
+            <h1>The Cheesy Poofs</h1>
+            <div class="controls">
+                <select id="event">
+                    <option disabled="disabled" value="no">Loading Events...</option>
+                </select>
+                <input id="team" placeholder="Team Number"/>
+                <button onclick="load()">Go</button>
+            </div>
+        </header>
+        <div class="content">
+            <div id="schedule"><h1>Schedule</h1><table></table><div id="timer">Loading...</div><br/><div id="lag"></div><br /><label>Account for lag in timer: <input type="checkbox" id="accountForLag" checked="true"/></label></div>
+            <div id="rankings"><h1>Rankings</h1><table></table></div>
+        </div>
+    </body>
+    <script type="text/javascript">
+    
+        //date formatting :)
+        Date.prototype.format=function(e){var t="";var n=Date.replaceChars;for(var r=0;r<e.length;r++){var i=e.charAt(r);if(r-1>=0&&e.charAt(r-1)=="\\"){t+=i}else if(n[i]){t+=n[i].call(this)}else if(i!="\\"){t+=i}}return t};Date.replaceChars={shortMonths:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],longMonths:["January","February","March","April","May","June","July","August","September","October","November","December"],shortDays:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],longDays:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],d:function(){return(this.getDate()<10?"0":"")+this.getDate()},D:function(){return Date.replaceChars.shortDays[this.getDay()]},j:function(){return this.getDate()},l:function(){return Date.replaceChars.longDays[this.getDay()]},N:function(){return this.getDay()+1},S:function(){return this.getDate()%10==1&&this.getDate()!=11?"st":this.getDate()%10==2&&this.getDate()!=12?"nd":this.getDate()%10==3&&this.getDate()!=13?"rd":"th"},w:function(){return this.getDay()},z:function(){var e=new Date(this.getFullYear(),0,1);return Math.ceil((this-e)/864e5)},W:function(){var e=new Date(this.getFullYear(),0,1);return Math.ceil(((this-e)/864e5+e.getDay()+1)/7)},F:function(){return Date.replaceChars.longMonths[this.getMonth()]},m:function(){return(this.getMonth()<9?"0":"")+(this.getMonth()+1)},M:function(){return Date.replaceChars.shortMonths[this.getMonth()]},n:function(){return this.getMonth()+1},t:function(){var e=new Date;return(new Date(e.getFullYear(),e.getMonth(),0)).getDate()},L:function(){var e=this.getFullYear();return e%400==0||e%100!=0&&e%4==0},o:function(){var e=new Date(this.valueOf());e.setDate(e.getDate()-(this.getDay()+6)%7+3);return e.getFullYear()},Y:function(){return this.getFullYear()},y:function(){return(""+this.getFullYear()).substr(2)},a:function(){return this.getHours()<12?"am":"pm"},A:function(){return this.getHours()<12?"AM":"PM"},B:function(){return Math.floor(((this.getUTCHours()+1)%24+this.getUTCMinutes()/60+this.getUTCSeconds()/3600)*1e3/24)},g:function(){return this.getHours()%12||12},G:function(){return this.getHours()},h:function(){return((this.getHours()%12||12)<10?"0":"")+(this.getHours()%12||12)},H:function(){return(this.getHours()<10?"0":"")+this.getHours()},i:function(){return(this.getMinutes()<10?"0":"")+this.getMinutes()},s:function(){return(this.getSeconds()<10?"0":"")+this.getSeconds()},u:function(){var e=this.getMilliseconds();return(e<10?"00":e<100?"0":"")+e},e:function(){return"Not Yet Supported"},I:function(){var e=null;for(var t=0;t<12;++t){var n=new Date(this.getFullYear(),t,1);var r=n.getTimezoneOffset();if(e===null)e=r;else if(r<e){e=r;break}else if(r>e)break}return this.getTimezoneOffset()==e|0},O:function(){return(-this.getTimezoneOffset()<0?"-":"+")+(Math.abs(this.getTimezoneOffset()/60)<10?"0":"")+Math.abs(this.getTimezoneOffset()/60)+"00"},P:function(){return(-this.getTimezoneOffset()<0?"-":"+")+(Math.abs(this.getTimezoneOffset()/60)<10?"0":"")+Math.abs(this.getTimezoneOffset()/60)+":00"},T:function(){var e=this.getMonth();this.setMonth(0);var t=this.toTimeString().replace(/^.+ \(?([^\)]+)\)?$/,"$1");this.setMonth(e);return t},Z:function(){return-this.getTimezoneOffset()*60},c:function(){return this.format("Y-m-d\\TH:i:sP")},r:function(){return this.toString()},U:function(){return this.getTime()/1e3}}
+
+
+        //Set this to any team number
+        var teamNumber = 254;
+        var room = "2016new"
+        //Filters matches
+        var dats = []
+        var dats_matches = []
+        
+        var lag = 0;
+        
+        var accountForLagMode = true;
+        
+        
+        var socket = io("https://254robottest-vmcool09.c9.io/schedule")
+        var rsocket = io("https://254robottest-vmcool09.c9.io/rankings")
+        var lagSocket = io("https://254robottest-vmcool09.c9.io/lag")
+        
+        lagSocket.on('message', function(data) {
+            console.log(data);
+        })
+        lagSocket.on('connect', function(){
+            lagSocket.emit('setEvent', room);
+        });
+        lagSocket.on('lag', function(l){
+            lag = l;
+            console.log("Current Event Lag: " + lag)
+            $("#lag").html("Approximate match delay: <strong>" + Math.floor(Math.abs((l/3600000))) + "h " + Math.floor(Math.abs((l/3600000)%1*60)) + "m " + Math.round(Math.abs(((l/60000)%1)*60)) + "s " + ((l < 0)? "</strong><strong style='color:green'>ahead of schedule</strong>" : "<strong style='color:red'>behind schedule</strong>"))
+        })
+        
+        socket.on('message', function (data) {
+            console.log(data);
+        });
+        rsocket.on('message', function (data) {
+            console.log(data);
+        });
+        rsocket.on('connect', function(){
+            rsocket.emit('setEvent', room);
+        });
+        socket.on('connect', function(){
+            socket.emit('setEvent', room);
+        });
+        socket.on('schedule', function (data) {
+            stored = JSON.parse(data);
+            //console.log(stored)
+            console.log(stored.length)
+            renderSchedule(stored);
+        });
+        rsocket.on('rankings', function (data) {
+            //console.log("got rankings: " + data)
+            renderRankings(JSON.parse(data));
+        });
+        socket.on('eventList', function (data) {
+            var out = $("#event")
+            data = JSON.parse(data)
+            out.html("")
+            for (var key in data){
+                out.append("<option value='" + key + "'>" + data[key] + "</option>")
+            }
+        });
+        
+        $("#accountForLag").bind("click", function(){
+            accountForLagMode = $("#accountForLag").is(':checked');
+        })
+        
+        function renderRankings(rankings){
+            var out = $("#rankings table")
+            out.html("")
+            if (rankings != null && rankings.length > 0){
+                for (var i = 0; i < rankings.length; i++){
+                    var initial = "<tr>"
+                    var toAppend = ""
+                    for (var j = 0; j < rankings[i].length; j++){
+                        if (rankings[i][j] == teamNumber && j == 1){
+                            initial = "<tr style=\"background-color:#FFFD6E\">"
+                            toAppend += "<td><strong>" + rankings[i][j] + "</strong></td>"
+                        } else {
+                            toAppend += "<td>" + rankings[i][j] + "</td>"
+                        }
+                    }
+                    toAppend += "</tr>"
+                    out.append(initial + toAppend)
+                }
+            } else {
+                out.html("<tr><td><h1>No rankings for now</h1></td></tr>")
+            }
+        }
+        function renderSchedule(schedule){
+            var out = $("#schedule table")
+            dats = []
+            dats_matches = []
+            if (schedule != null){
+                schedule = tsort(schedule.sort(msort), teamNumber)
+                out.html("<tr><td></td><td>&nbsp;</td><td>1</td><td>2</td><td>3</td><td>1</td><td>2</td><td><center>3</center></td><td></td></tr>")
+                for (var i = 0; i < schedule.length; i++){
+                    var match = schedule[i]
+                    var type = ""
+                    dats.push(match.time)
+                    dats_matches.push(match)
+                    switch (match.comp_level){
+                        case "qm":
+                            type = "Qual"
+                            break;
+                        case "qf":
+                            type = "Quarterfinal"
+                            break;
+                        case "sf":
+                            type = "Semifinal"
+                            break;
+                        case "f":
+                            type = "Final"
+                            break;
+                        default:
+                            type = match.comp_level
+                            break;
+                    }
+                    var ts = formatDate(match.time)
+                    if (match.time == null){
+                        ts = "Unknown"
+                    }
+                    if (match.alliances.blue.score != -1){
+                        if (match.alliances.blue.score > match.alliances.red.score){
+                            ts = "(Blue) " + match.alliances.blue.score + " - " + match.alliances.red.score
+                        } else {
+                            ts = "(Red) " + match.alliances.red.score + " - " + match.alliances.blue.score
+                        }
+                    }
+                    for (var j = 0; j < 3; j++){
+                            if (match.alliances.red.teams[j] == "frc" + teamNumber){
+                                match.alliances.red.teams[j] = "<b style='color:#FFF'>" + teamNumber + "</b>"
+                            } else {
+                                match.alliances.red.teams[j] = match.alliances.red.teams[j].substring(3)
+                            }
+                        }
+                    for (var j = 0; j < 3; j++){
+                            if (match.alliances.blue.teams[j] == "frc" + teamNumber){
+                                match.alliances.blue.teams[j] = "<b style='color:#FFF'>" + teamNumber + "</b>"
+                            } else {
+                                match.alliances.blue.teams[j] = match.alliances.blue.teams[j].substring(3)
+                            }
+                        }
+                    out.append("<tr><td>" + type + "</td><td>" + match.match_number + "</td><td>" + match.alliances.red.teams[0] + "</td><td>" + match.alliances.red.teams[1] + "</td><td>" + match.alliances.red.teams[2] + "</td><td>" + match.alliances.blue.teams[0] + "</td><td>" + match.alliances.blue.teams[1] + "</td><td>" + match.alliances.blue.teams[2] + "</td><td>" + ts + "</td></tr>")
+                }
+            } else {
+                out.html("<tr><td><h1>No schedule for now</h1></td></tr>")
+            }
+        }
+        
+        //match sorter (use as param for .sort())
+        function msort(a, b){
+            var mPriority = {
+                "f": 4,
+                "sf": 3,
+                "qf": 2,
+                "qm": 1,
+            }
+            if (mPriority[a.comp_level] > mPriority[b.comp_level]) {
+                return 1
+            } else if (mPriority[a.comp_level] < mPriority[b.comp_level]) {
+                return -1
+            } else {
+                if (a.match_number > b.match_number){
+                    return 1
+                } else if (a.match_number < b.match_number) {
+                    return -1
+                }
+            }
+            return 0
+        }
+        
+        //team sorter (removes matches in which a team does not play) needs an array and num as param
+        
+        function tsort(matchList, team){
+            sorted = []
+            for (var i = matchList.length-1; i >=0; --i){
+                var match = matchList[i]
+                if (match.alliances.red.teams[0].substring(3) != team && match.alliances.red.teams[1].substring(3) != team && match.alliances.red.teams[2].substring(3) != team && match.alliances.blue.teams[0].substring(3) != team && match.alliances.blue.teams[1].substring(3) != team && match.alliances.blue.teams[2].substring(3) != team){
+                    matchList.pop(i)
+                } else {
+                    sorted.push(match)
+                }
+            }
+            return sorted.reverse()
+        }
+        
+        
+        //Misc
+        $("#team").keyup(function (e) {
+            if (e.keyCode == 13) {
+                load()
+            }
+        });
+        function load(){
+            var teamn = $("#team").val()
+            var event = $("#event").val()
+            if (parseInt(teamn) > 0 && event != "no"){
+                $("#schedule table").html("<tr><td><h1>Loading Schedule...</h1></td></tr>")
+                $("#rankings table").html("<tr><td><h1>Loading Rankings...</h1></td></tr>")
+                if (room != ""){
+                    socket.emit('unsetEvent', room);
+                    rsocket.emit('unsetEvent', room);   
+                    lagSocket.emit('unsetEvent', room);
+                }
+                socket.emit('setEvent', event);
+                rsocket.emit('setEvent', event);
+                lagSocket.emit('setEvent', event);
+                teamNumber = teamn;
+                room = event
+            } else {
+            }
+        }
+        function formatDate(unixString){
+            return (new Date(unixString * 1000)).format("h:i a")
+        }
+        setInterval(function(){
+            var out = $("#timer")
+            dats.sort()
+            if (dats.length > 0){
+                for (var i = 0; i < dats.length; i++){
+                    var diff = (new Date(dats[i] * 1000) - new Date() + ((accountForLagMode)? lag : 0)) /60000
+                    if (diff > 0){
+                        var matchNo = null;
+                        for (var match in dats_matches) {
+                            if (dats_matches[match]["time"] == dats[i]) {
+                                matchNo = dats_matches[match]["match_number"];
+                            }
+                        }
+                        
+                        //This is the time to next match
+                        if (Math.round(diff) >= 20){
+                            out.addClass("green")
+                            out.removeClass("yellow")
+                            out.removeClass("red")
+                        } else if(Math.round(diff) < 20 && Math.round(diff) >= 15){
+                            out.addClass("yellow")
+                            out.removeClass("green")
+                            out.removeClass("red")
+                        } else if(Math.round(diff) < 15){
+                            out.addClass("red")
+                            out.removeClass("green")
+                            out.removeClass("yellow")
+                        }
+                        out.html(Math.round(diff) + " minutes away from match " + matchNo)
+                        break;
+                    } else if (i == (dats.length - 1)){
+                        //This is the time from the last match, all matches played
+                        out.html("Last match was " + -Math.round(diff) + " minutes ago")
+                    }
+                }
+            } else {
+                out.html("")
+            }
+            //Minutes away
+        }, 2000)
+    </script>
+</html>
